@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Angel Locks - Dapp </title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <link href="css/toastr.min.css" rel="stylesheet">
+  <link href="css/ip2location-image-sprite.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- <div class='container'>
+        <div class="text-center">
+
+          <h3 id='country-name'></h3>      
+          <div id='flagpic'></div>
+        </div> -->
+  <script>
+    function openDonorForm() {
+      document.getElementById("donorForm").style.display = "block";
+    }
+
+    function closeDonorForm() {
+      document.getElementById("donorForm").style.display = "none";
+    }
+    function openOrgForm() {
+      document.getElementById("orgRegForm").style.display = "block";
+    }
+
+    function closeOrgForm() {
+      document.getElementById("orgRegForm").style.display = "none";
+    }
+  </script>
+  <style>
+    .open {
+      box-sizing: border-box;
+    }
+
+    .loader {
+      /* display: inline-block; */
+      display: none;
+      border: 16px solid #f3f3f3;
+      /* Light grey */
+      border-top: 16px solid #3498db;
+      /* Blue */
+      border-radius: 50%;
+      /* width: 120px;
+  height: 120px;   */
+      position: absolute;
+      /*left: 0px;*/
+      top: 50%;
+      /* width: 100%;
+  height: 100%;
+  z-index: 9999; */
+      /* top: 50%;
+  left: 50%;
+  width: 50%; */
+      animation: spin 2s linear infinite;
+      /* position: fixed; */
+      width: 120px;
+      height: 120px;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* background: #fff url('images/loader.gif') no-repeat center center; */
+      /* z-index: 9999; */
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Button used to open the contact form - fixed at the bottom of the page */
+    .open-button {
+      background-color: #555;
+      color: white;
+      padding: 16px 20px;
+      border: none;
+      cursor: pointer;
+      opacity: 0.8;
+      position: fixed;
+      bottom: 23px;
+      right: 28px;
+      width: 280px;
+    }
+
+    /* The popup form - hidden by default */
+    .form-popup {
+      display: none;
+      position: fixed;
+      /* bottom: 0; */
+      top: 50%;
+      left: 50%;
+      width: 50%;
+      transform: translate(-50%, -50%);
+      /* right: 15px; */
+      border: 3px solid #f1f1f1;
+      z-index: 9;
+    }
+
+    /* Add styles to the form container */
+    .form-container {
+      /* max-width: 300px; */
+      padding: 5px;
+      background-color: white;
+    }
+
+    /* Full-width input fields */
+    .form-container input[type=text],
+    .form-container input[type=password] {
+      width: 70%;
+      padding: 7px;
+      margin: 5px 0 15px 0;
+      border: none;
+      background: #f1f1f1;
+
+    }
+
+    /* When the inputs get focus, do something */
+    .form-container input[type=text]:focus,
+    .form-container input[type=password]:focus {
+      background-color: #ddd;
+      outline: none;
+    }
+
+    /* Set a style for the submit/login button */
+    .form-container .btn {
+      background-color: #04AA6D;
+      color: white;
+      padding: 16px 20px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+
+    /* Add a red background color to the cancel button */
+    .form-container .cancel {
+      background-color: red;
+    }
+
+    /* Add some hover effects to buttons */
+    .form-container .btn:hover,
+    .open-button:hover {
+      opacity: 1;
+    }
+
+    .viewmatches-container{
+      display: none;
+    }
+  </style>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <div class='row col-lg-12 text-center'>
+    <div class="col-lg-6 windowbox">
+      <div class="form-group">
+        <!-- <label class="sr-only">Name</label> -->
+        <!-- <input type="number" class="form-control" id="Initialize" placeholder="Initialize"> -->
+        <br>
+        <button type="button" id="registeru" class="btn btn-primary " onclick="openDonorForm()">Register as User
+        </button>
+      </div>
+      <!-- The form -->
+      <div class="form-popup" id="donorForm" onsubmit="return false">
+        <!-- <form action="/action_page.php" class="form-container"> -->
+        <form class="form-container">
+          <h1>Register</h1>
+
+          <label for="name"><b>Name :</b></label>
+          <input id="name" type="text" placeholder="Enter Name" name="name" required><br>
+
+          <label for="email"><b>Email :</b></label>
+          <input id="email" type="text" placeholder="Enter Email" name="email" required><br>
+
+          <label for="contactno"><b>Contact Number :</b></label>
+          <input id="contactno" type="text" placeholder="Enter Contact Number" name="contactno" required><br>
+
+          <label for="dob"><b>Date Of Birth : </b></label>
+          <input id="dob" type="date" placeholder="Enter DOB" name="dob" required><br>
+
+          <label for="gender"><b>Gender : </b></label>
+          <input id="gender" type="text" placeholder="Enter Gender" name="gender" required><br>
+
+          <!-- <label for="details"><b>Choose your hair type : </b></label><br>
+          <input type="checkbox" id="gray" name="type" value="gray">
+          <label for="gray"> Gray </label><br>
+          <input type="checkbox" id="permed" name="type" value="permed">
+          <label for="permed"> Permed </label><br>
+          <input type="checkbox" id="colored" name="type" value="colored">
+          <label for="colored"> Colored </label><br><br> -->
+          <label for="details"><b>Choose your hair type : </b></label>
+          <select name="type" id="type">
+            <option value="gray">Gray</option>
+            <option value="colored">Colored</option>
+          </select>
+          <br><br>
+
+          <label for="texture"><b>Choose your hair texture : </b></label>
+          <select name="texture" id="texture">
+            <option value="curly">Curly</option>
+            <option value="straight">Straight</option>
+            <option value="wavy">Wavy</option>
+          </select>
+          <br><br>
+
+          <label for="length"><b>Length in centimeters : </b></label>
+          <input id="length" type="length" placeholder="Enter Hair Length" name="length" required>
+
+          <button type="registeruser" id="registeruser" class="btn btn-primary">Register</button>
+          <button type="button" class="btn cancel" onclick="closeDonorForm()">Close</button>
+        </form>
+      </div>
+
+      <div class="loader"></div>
+      <div class="form-group">
+        <!-- <label class="sr-only">Email</label>
+                  <input type="number" class="form-control" id="Increment" placeholder="Increment">
+                  <br> -->
+        <button type="button" id="registero" class="btn btn-primary" onclick="openOrgForm()">Register as
+          Organization</button>
+      </div>
+      <div class="form-popup" id="orgRegForm" onsubmit="return false">
+        <!-- <form action="/action_page.php" class="form-container"> -->
+        <form class="form-container">
+          <h1>Register as a Organization</h1>
+
+          <label for="orgname"><b>Name :</b></label>
+          <input id="orgname" type="text" placeholder="Enter Name" name="orgname" required><br>
+
+          <label for="orgemail"><b>Email :</b></label>
+          <input id="orgemail" type="text" placeholder="Enter Email" name="orgemail" required><br>
+
+          <label for="orgcontactno"><b>Contact Number :</b></label>
+          <input id="orgcontactno" type="text" placeholder="Enter Contact Number" name="orgcontactno" required><br>
+
+          <label for="orgaddress"><b>Address :</b></label>
+          <input id="orgaddress" type="text" placeholder="Enter Address" name="orgaddress"><br>
+
+          <label for="orgdetails"><b>Choose hair donation requirements : </b></label><br>
+                  <input type="checkbox" id="orggray" name="orgtype" value="orggray">
+                  <label for="orggray"> Gray </label><br>
+                  <input type="checkbox" id="orgpermed" name="orgtype" value="orgpermed">
+                  <label for="orgpermed"> Permed </label><br>
+                  <input type="checkbox" id="orgcolored" name="orgtype" value="orgcolored">
+                  <label for="orgcolored"> Colored </label><br><br>
+      
+                  <label for="orgtexture"><b>Choose allowed hair textures : </b></label><br>
+                  <input type="checkbox" id="orgwavy" name="orgtext" value="orgwavy">
+                  <label for="orgwavy"> Wavy </label><br>
+                  <input type="checkbox" id="orgcurly" name="orgtext" value="orgcurly">
+                  <label for="orgcurly"> Curly </label><br>
+                  <input type="checkbox" id="orgstraight" name="orgtext" value="orgstraight">
+                  <label for="orgstraight"> Straight </label>
+          <br><br>
+
+          <label for="orglength"><b>Minimum hair length : </b></label>
+          <input id="orglength" type="text" placeholder="Enter Hair Length" name="orglength" required>
+
+          <button type="button" id="registerorg" class="btn btn-primary">Register</button>
+          <button type="button" class="btn cancel" onclick="closeOrgForm()">Close</button>
+        </form>
+      </div>
+      <div class="form-group">
+        <!-- <label class="sr-only">Email</label>
+                <input type="number" class="form-control" id="Decrement" placeholder="Decrement"> -->
+        <br>
+        <button type="button" id="viewmatches" class="btn btn-primary ">View Matches</button>
+      </div>
+      <!-- Table for view matches -->
+      <div class="viewmatches-container">
+        <div class="row">
+            <div class="col-sm-6">
+                <h2>List of Organizations</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <table id="orgTable" class="table table-bordered table-condensed table-striped">
+                    <thead>
+                        <tr>
+                            <th>Organization Name</th>
+                            <th>Address</th>
+                            <th>Contact Number</th>
+                            <th>Email</th>
+                            <th>Donate</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+     <!-- End of Table for view matches -->
+    </div>
+    <div class="col-lg-6 windowbox">
+      <div class="form-group ">
+        <button type="button" id="viewStatus" class="btn btn-info mb-2">View Donation Status</button>
+        <h1 id="counter_value"></h1>
+      </div>
+      <!-- Table for view donations -->
+      <div class="row">
+        <div class="col-sm-6">
+            <table id="donTable" class="table table-bordered table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>Donated To</th>   <!-- Show hair donation details ? -->
+                        <th>Address</th>
+                        <th>Contact Number</th>
+                        <th>Email</th>
+                        <th>Donation Status</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+      <div class="form-group ">
+        <button type="button" id="viewDonations" class="btn btn-info mb-2">View & Update Donations</button>
+        <!-- <h1 id="counter_value"></h1> -->
+        <!-- Start of View Donation table -->
+        <div class="row">
+          <div class="col-sm-6">
+              <table id="viewDonTable" class="table table-bordered table-condensed table-striped">
+                  <thead>
+                      <tr>
+                          <th>Donated By</th>   <!-- Show hair donation details ? -->
+                          <th>Hair Type</th>
+                          <th>Hair Length</th>
+                          <th>Hair Texture</th>
+                          <th>Donation Status</th>
+                      </tr>
+                  </thead>
+              </table>
+          </div>
+      </div>
+      <!-- End of View Donation table -->
+      </div>
+    </div>
+  </div>
+</body>
+<script src="js/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script src="js/app.js"></script>
+
+</html>
