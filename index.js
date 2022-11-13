@@ -134,13 +134,23 @@ app.post("/donation/getByIds", async(req, res) => {
     }
   }
   let result = await donationSchema.find(_filter)
-  let userdata = await userSchema.find({accountAddress : result.map((e)=> e.donor_id)},'name contactNo email' )
+  let userdata = await userSchema.find({accountAddress : result.map((e)=> e.donor_id)})
   let response = result.map((r)=> {
     let u =  (userdata.find((f) => f.accountAddress == r.donor_id)) || {}
-    return {...r,...u}
+    return {...r._doc,...u._doc}
   })
 
   res.send(response)
+  
+});
+
+app.put("/donation/updateStatus/:donation_id", async(req, res) => {
+  let _filter = {
+    donation_id : req.params.donation_id || []
+  }
+  let _newValue = req.body
+  let result = await donationSchema.updateOne(_filter, _newValue)
+  res.send(result)
   
 });
 
