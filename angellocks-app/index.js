@@ -95,6 +95,32 @@ app.post("/org/getByAddresses", async(req, res) => {
   
 });
 
+app.post("/org/getDonations", async(req, res) => {
+  let _filter = {
+    accountAddress :{
+      $in : req.body.org || []
+    }
+  }
+  let result = await orgSchema.find(_filter)
+  let _dfilter = {
+    donor_id : req.body.donor || "",
+    org_id : {
+      $in : req.body.org || []
+    }
+  }
+  let dons = await donationSchema.find(_dfilter)
+
+  let response = dons.map((e) => {
+    let _curr = result.find((d) => e.org_id == d.accountAddress) || {}
+    return {
+      ...e._doc,
+      ..._curr._doc
+    }
+  })
+
+  res.send(response)
+  
+});
 
 
 app.delete("/org/deleteByAddress/:accountAddress", async(req, res) => {

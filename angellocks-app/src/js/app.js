@@ -1,16 +1,8 @@
 App = {
   web3: null,
   contracts: {},
-  // address:'0x05697E826377A6F2bba04C014Cd59afb83679459', // Bib deployment Nov 7th
-  // address: '0xE3888b9a080687Bb62F2f25FfF26c079E9a899De' , // Bib deployment Nov 8th 0xE3888b9a080687Bb62F2f25FfF26c079E9a899De
-  // address: '0x5A2C05278DE6334F1a27b092Fc9a322345d2eC4E', // Deployment Nov 10th
-  // address: '0x4FF516cBe72d50E2B3ED526dc3170288de17a3BF', // Nov 10th with gllobal array for matches
-  // address: '0x480C212de75B44485e110921Fee6e49Be983dABF', // length of matches array = org length
-  // address: '0x4A6eFa7AaD44d8461f10bEF48421161e77512321', // Nov 11th with view donation status and donate button
-  // address: '0xD67B72A6F03a73303939b98A5Cc7344740aF7435', //Ganache first deploymeny onlydonor with param
-  // address:"0xe7F5356dE22dF9eEf1843C8368d428C78441B7F3", //All functions rolled out on goerli - 12th Nov 18:17
-  address:'0x15Ce714188eBcAFDCb8e9E5f1a23edFDc5B76f8E',
-  network_id: 3, // 5777 for local
+  address: '0x45c49bbBDc03eA74547914e39a15609db1cbFf98',
+  network_id: 5777, // 5777 for local
   handler: null,
   value: 1000000000000000000,
   index: 0,
@@ -34,17 +26,7 @@ App = {
   },
 
   initContract: function () {
-    App.contracts.AL1 = new App.web3.eth.Contract(App.abi, App.address, {});
-    // console.log(random)
-    // $.getJSON('flags.json',(d)=>{
-    //   var index = Math.floor((Math.random() * 243) + 1);
-
-    //   for(var i in d[index]){
-    //     $('#flag').addClass('flag-'+i)
-    //     $('#country-name').html(d[index][i])
-    //   }
-
-    // })     
+    App.contracts.Angellocks = new App.web3.eth.Contract(App.abi, App.address, {});
     return App.bindEvents();
   },
 
@@ -63,7 +45,7 @@ App = {
           contactNo: jQuery('#contactno').val(),
           gender: jQuery('#gender').val(),
           status: 'NEW',
-          accountAddress: App.handler,
+          accountAddress: App.handler.toLowerCase(),
         }
         // var array = $.map($('input[name="type"]:checked'), function(c){return c.value; })
 
@@ -82,7 +64,7 @@ App = {
         hairtype[$('#type').val()] = true
 
         var mongohair = {
-          ...hairtype, ...{ texture : $('#texture').val() }
+          ...hairtype, ...{ texture: $('#texture').val() }
         }
         // for (i in array){
         //   hairtype[array[i]] = true
@@ -113,7 +95,6 @@ App = {
         // var typearray = $.map($('input[name="orgtype"]:checked'), function(c){return c.value; })
 
         var hairtype = {
-          // permed :  $("#orgpermed").is(':checked'),
           gray: $("#orggray").is(':checked'),
           colored: $("#orgcolored").is(':checked'),
           length: parseInt(jQuery('#orglength').val()),
@@ -137,6 +118,7 @@ App = {
       // App.handleInitialization(jQuery('#Initialize').val());
     });
     $(document).on('click', '#viewmatches', function () {
+      $(".loader").css("display", "inline-block");
       App.populateAddress().then(r => App.handler = r[0]).then(() => {
         App.handleViewMatches();
       })
@@ -144,6 +126,7 @@ App = {
     });
     $(document).on('click', '[id^=donate_]', function () {
       $(".loader").css("display", "inline-block");
+      $("#viewMatchesForm").css("opacity","0.3");
       App.populateAddress().then(r => App.handler = r[0]).then(() => {
         let orgAddress = $(this).attr('id').split("_")[1];
         console.log(orgAddress);
@@ -153,16 +136,18 @@ App = {
 
     });
     $(document).on('click', '#viewStatus', function () {
+      $(".loader").css("display", "inline-block");
       App.populateAddress().then(r => App.handler = r[0]).then(() => {
         App.handleViewStatus();
       })
 
     });
     $(document).on('click', '#viewDonations', function () {
-      App.populateAddress().then(r => App.handler = r[0]).then(()=>{
+      $(".loader").css("display", "inline-block");
+      App.populateAddress().then(r => App.handler = r[0]).then(() => {
         App.handleViewDonations();
       })
-      
+
     });
 
     $(document).on('click', '[id^=accept_]', function () {
@@ -185,20 +170,20 @@ App = {
       })
 
     });
-    
+
     //App.populateAddress().then(r => App.handler = r[0]);
   },
   populateAddress: async function () {
     // App.handler=App.web3.givenProvider.selectedAddress;
     // var res = await ethereum.request({ method: 'eth_requestAccounts' });
     // web3.eth.defaultAccount= "0x80adE0F380De8441CCCaBf2CabcA7C956d8fD7f5";
-    let res = ["0x80adE0F380De8441CCCaBf2CabcA7C956d8fD7f5"]
+    let res = await ethereum.request({ method: 'eth_requestAccounts' });
     console.log(res)
     return res
   },
 
   handleUserRegister: async function (registerdata, hairtype, mongohair) {
-    let _data = {...registerdata, ...mongohair}
+    let _data = { ...registerdata, ...mongohair }
     $.ajax({
       type: 'POST', url: `http://localhost:3010/user/create`, data: _data,
     }).done(function (res) {
@@ -208,9 +193,9 @@ App = {
       if (!res.msg) {
         var option = { from: App.handler }
         console.log(option)
-        // console.log(App.contracts.AL1.methods)
+        // console.log(App.contracts.Angellocks.methods)
         // console.log(hairtype.permed, hairtype.gray, hairtype.colored, hairtype.length, hairtype.texture)
-        App.contracts.AL1.methods.register(
+        App.contracts.Angellocks.methods.register(
           // 0,hairtype.permed, hairtype.gray, hairtype.colored, hairtype.length, hairtype.wavy,  hairtype.curly,  hairtype.straight)
           0, hairtype.gray, hairtype.colored, hairtype.length, hairtype.wavy, hairtype.curly, hairtype.straight)
           .send(option)
@@ -218,6 +203,7 @@ App = {
             if (receipt.status) {
               console.log("Success it seems")
               $(".loader").css("display", "none");
+              $("#maindiv").css("opacity", 1);
               toastr.success("Registered on blockchain");
 
             }
@@ -230,6 +216,7 @@ App = {
               console.log('Data deleted from mongo db due to error in smart contract')
               console.log(err)
               $(".loader").css("display", "none");
+              $("#maindiv").css("opacity", 1);
               toastr.error("Error ocurred in registration process");
 
             })
@@ -238,6 +225,7 @@ App = {
       }
       else {
         $(".loader").css("display", "none");
+        $("#maindiv").css("opacity", 1);
       }
 
     })
@@ -255,9 +243,9 @@ App = {
       if (!res.msg) {
         var option = { from: App.handler }
         console.log(option)
-        // console.log(App.contracts.AL1.methods)
+        // console.log(App.contracts.Angellocks.methods)
         // console.log(hairtype.permed, hairtype.gray, hairtype.colored, hairtype.length, hairtype.texture)
-        App.contracts.AL1.methods.register(
+        App.contracts.Angellocks.methods.register(
           1, hairtype.gray, hairtype.colored, hairtype.length, hairtype.wavy, hairtype.curly, hairtype.straight)
           // 1,hairtype.permed, hairtype.gray, hairtype.colored, hairtype.length, hairtype.wavy,  hairtype.curly,  hairtype.straight)
           .send(option)
@@ -265,7 +253,8 @@ App = {
             if (receipt.status) {
               console.log("Success it seems for org")
               $(".loader").css("display", "none");
-              toastr.success("Org registered on blockchain");
+              $("#maindiv").css("opacity", 1);
+              toastr.success("Organization registered on blockchain");
 
             }
           })
@@ -277,7 +266,8 @@ App = {
               console.log('Data deleted from mongo db due to error in smart contract')
               console.log(err)
               $(".loader").css("display", "none");
-              toastr.error("Error ocurred in registration process");
+              $("#maindiv").css("opacity", 1);
+              toastr.error("Error occurred in registration process");
 
             })
 
@@ -285,6 +275,7 @@ App = {
       }
       else {
         $(".loader").css("display", "none");
+        $("#maindiv").css("opacity", 1);
       }
 
     })
@@ -294,7 +285,7 @@ App = {
   handleViewMatches: function () {
 
     // var option = { from: App.handler }
-    App.contracts.AL1.methods.match_org(App.handler)
+    App.contracts.Angellocks.methods.match_org(App.handler)
       .call()
       .then(async (results) => {
         // if (receipt.status) {
@@ -302,6 +293,7 @@ App = {
         $(".loader").css("display", "none");
         console.log(results);
         var orgs = results.filter((e) => e != '0x0000000000000000000000000000000000000000')
+        orgs = orgs.map((o) => o.toLowerCase())
         // jQuery('#counter_value').text(r);
         $.ajax({
           type: 'POST', url: `http://localhost:3010/org/getByAddresses`, data: { accountAddress: orgs }
@@ -325,12 +317,21 @@ App = {
 
           }
 
-          $(".viewmatches-container").css("display", "block");
+          // $(".viewmatches-container").css("display", "block");
           $(".loader").css("display", "none");
-          console.log(orgdata)
+          $("#viewMatchesForm").css("display", "block");
+          // $("#viewMatchesForm").css("backdrop-filter", "blur(3px)");
+          $("#maindiv").css("opacity", 0.2);
+          console.log(orgdata);
           toastr.success("Matches recieved");
 
         })
+      })
+      .catch((error) => {
+        $(".loader").css("display", "none");
+        console.log("Error in smart contract call")
+        console.log(error)
+        toastr.error("Transaction not authorized for user!");
       })
   },
 
@@ -347,7 +348,7 @@ App = {
     }
 
     var option = { from: App.handler }
-    App.contracts.AL1.methods.donate(_data['org_id'], _data['donor_id'], _data['timestamp'])
+    App.contracts.Angellocks.methods.donate(_data['org_id'], _data['donor_id'], _data['timestamp'])
       .send(option)
       .on('receipt', async (receipt) => {
         if (receipt.status) {
@@ -355,13 +356,15 @@ App = {
           console.log('Donate Transaction recorded on the blockchain!')
 
           // Insert record into mongodb
-          let index = await App.contracts.AL1.methods.getDonationsCount().call()
+          let index = await App.contracts.Angellocks.methods.getDonationsCount().call()
           console.log(index)
           _data.donation_id = index - 1
           $.ajax({
             type: 'POST', url: `http://localhost:3010/donation/donate`, data: _data
           }).done((res) => {
             $(".loader").css("display", "none");
+            $("#viewMatchesForm").css("display","none");
+            $("#maindiv").css("opacity", 1);
             toastr.success("Donation Recorded !");
           })
         }
@@ -369,7 +372,8 @@ App = {
       .on('error', (err) => {
         console.log(err)
         $(".loader").css("display", "none");
-        toastr.error("Error ocurred in registration process");
+        $("#viewMatchesForm").css("opacity",1);
+        toastr.error("Error ocurred in registration process !");
         toastr.error(err)
       })
 
@@ -377,15 +381,17 @@ App = {
 
   handleViewStatus: function () {
 
-    App.contracts.AL1.methods.view_donation_status(App.handler)
+    App.contracts.Angellocks.methods.view_donation_status(App.handler)
       .call()
       .then((results) => {
 
         let orgAddresses = results.addresses
+        orgAddresses = orgAddresses.map((o) => o.toLowerCase())
         let statuses = results.statuses
+        let donor_address = App.handler.toLowerCase()
 
         $.ajax({
-          type: 'POST', url: `http://localhost:3010/org/getByAddresses`, data: { accountAddress: orgAddresses }
+          type: 'POST', url: `http://localhost:3010/org/getDonations`, data: { org: orgAddresses, donor: donor_address }
         }).done(function (orgdata) {
 
           if ($("#donTable tbody").length == 0) {
@@ -395,28 +401,41 @@ App = {
           for (let i = 0; i < orgAddresses.length; i++) {
 
             // Append org to the table
-            let _org = orgdata.find((e) => e.accountAddress == orgAddresses[i])
-            let _status = statuses[i] == 1 ? "ACCEPTED" : (statuses[i] == 2 ? "DECLINED" : "DONATED")
-            if (_org)
-            {
+            // let _org = orgdata.find((e) => e.accountAddress == orgAddresses[i])
+            let _org = orgdata[i]
+
+            // let _status = statuses[i] == 1 ? "ACCEPTED" : (statuses[i] == 2 ? "DECLINED" : "DONATED")
+            if (_org) {
               $("#donTable tbody").append("<tr>" +
                 "<td>" + _org.name + "</td>" +
                 "<td>" + _org.address + "</td>" +
                 "<td>" + _org.contactNo + "</td>" +
                 "<td>" + _org.email + "</td>" +
-                "<td>" + _status + "</td>" +
+                "<td>" + new Date(_org.timestamp) + "</td>" +
+                "<td>" + _org.status + "</td>" +
                 "</tr>");
             }
 
           }
 
+          $(".loader").css("display", "none");
+          $("#viewDonationStatusForm").css('display','block');
+          $("#maindiv").css("opacity", 0.2);
+          toastr.success("Your donations recieved");
+
         })
+      })
+      .catch((error) => {
+        $(".loader").css("display", "none");
+        console.log("Error in smart contract call")
+        console.log(error)
+        toastr.error("Transaction not authorized for user!");
       })
   },
 
   handleViewDonations: function () {
 
-    App.contracts.AL1.methods.view_donations(App.handler)
+    App.contracts.Angellocks.methods.view_donations(App.handler)
       .call()
       .then((results) => {
 
@@ -426,27 +445,37 @@ App = {
           type: 'POST', url: `http://localhost:3010/donation/getByIds`, data: { donation_id: donation_ids }
         }).done(function (donationdata) {
 
-          
+
           if ($("#viewDonTable tbody").length == 0) {
             $("#viewDonTable").append("<tbody id='tbody_don'></tbody>");
           }
           $("#tbody_don").empty();
           for (let i = 0; i < donationdata.length; i++) {
 
-              $("#viewDonTable tbody").append("<tr>" +
+            $("#viewDonTable tbody").append("<tr>" +
               "<td>" + donationdata[i].name + "</td>" +
               "<td>" + donationdata[i].email + "</td>" +
               "<td>" + donationdata[i].contactNo + "</td>" +
               "<td>" + donationdata[i].type + "</td>" +
               "<td>" + donationdata[i].length + "</td>" +
               "<td>" + donationdata[i].texture + "</td>" +
-              "<td><button type='button' id='accept_" +  donationdata[i].donation_id + "' class='btn btn-info mb-2'>Accept</button></td>" +
+              "<td><button type='button' id='accept_" + donationdata[i].donation_id + "' class='btn btn-info mb-2'>Accept</button></td>" +
               "<td><button type='button' id='reject_" + donationdata[i].donation_id + "' class='btn btn-info mb-2'>Reject</button></td>" +
               "</tr>");
 
           }
 
+          $(".loader").css("display", "none");
+          $("#viewDonationsForm").css("display", "block");
+          $("#maindiv").css("opacity", 0.2);
+
         })
+      })
+      .catch((error) => {
+        $(".loader").css("display", "none");
+        console.log("Error in smart contract call")
+        console.log(error)
+        toastr.error("Transaction not authorized for user!");
       })
   },
 
@@ -456,23 +485,25 @@ App = {
       return false
     }
 
-    var option ={from: App.handler}
+    var option = { from: App.handler }
     donation_id = parseInt(donation_id)
     decision = parseInt(decision)
-    App.contracts.AL1.methods.update_donation_status(donation_id,decision )
+    App.contracts.Angellocks.methods.update_donation_status(donation_id, decision)
       .send(option)
       .on('receipt', async (receipt) => {
         if (receipt.status) {
           console.log('Donate status updated on the blockchain!')
-        
+
           // Update donation status into mongodb
-          let _data = {status : 1 ? "ACCEPTED" : "REJECTED"}
-          console.log('Donate status updated on the blockchain to '+_data.status+'!')
+          let _data = { status: 1 ? "ACCEPTED" : "REJECTED" }
+          console.log('Donate status updated on the blockchain to ' + _data.status + '!')
           $.ajax({
             type: 'PUT', url: `http://localhost:3010/donation/updateStatus/${donation_id}`, data: _data
           }).done((res) => {
             $(".loader").css("display", "none");
-            if(decision == 1)
+            $("#maindiv").css("opacity", 1);
+            $("#viewDonationsForm").css("display","none");
+            if (decision == 1)
               toastr.success("Donation Accepted !");
             else
               toastr.success("Donation Rejected !");
@@ -576,8 +607,8 @@ App = {
     {
       "constant": false,
       "inputs": [{
-        "name":"donor_id",
-        "type":"address"
+        "name": "donor_id",
+        "type": "address"
       }],
       "name": "view_donation_status",
       "outputs": [
@@ -597,8 +628,8 @@ App = {
     {
       "constant": false,
       "inputs": [{
-        "name":"org_id",
-        "type":"address"
+        "name": "org_id",
+        "type": "address"
       }],
       "name": "view_donations",
       "outputs": [
@@ -630,13 +661,13 @@ App = {
       "constant": true,
       "inputs": [
         {
-        "name":"donation_id",
-        "type":"uint256"
-      },
-      {
-        "name":"decision",
-        "type":"uint256"
-      }
+          "name": "donation_id",
+          "type": "uint256"
+        },
+        {
+          "name": "decision",
+          "type": "uint256"
+        }
       ],
       "name": "update_donation_status",
       "outputs": [],
