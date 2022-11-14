@@ -126,7 +126,7 @@ App = {
     });
     $(document).on('click', '[id^=donate_]', function () {
       $(".loader").css("display", "inline-block");
-      $("#viewMatchesForm").css("opacity","0.3");
+      $("#viewMatchesForm").css("opacity", "0.3");
       App.populateAddress().then(r => App.handler = r[0]).then(() => {
         let orgAddress = $(this).attr('id').split("_")[1];
         console.log(orgAddress);
@@ -319,11 +319,21 @@ App = {
 
           // $(".viewmatches-container").css("display", "block");
           $(".loader").css("display", "none");
-          $("#viewMatchesForm").css("display", "block");
+
+          if (orgdata.length > 0) {
+            $("#viewMatchesForm").css("display", "block");
+            $("#maindiv").css("opacity", 0.2);
+            console.log(orgdata);
+            toastr.success("Matches recieved");
+          }
+          else {
+            $("#maindiv").css("opacity", 1);
+            console.log(orgdata);
+            toastr.success("No organization matches found !");
+
+          }
           // $("#viewMatchesForm").css("backdrop-filter", "blur(3px)");
-          $("#maindiv").css("opacity", 0.2);
-          console.log(orgdata);
-          toastr.success("Matches recieved");
+
 
         })
       })
@@ -363,7 +373,7 @@ App = {
             type: 'POST', url: `http://localhost:3010/donation/donate`, data: _data
           }).done((res) => {
             $(".loader").css("display", "none");
-            $("#viewMatchesForm").css("display","none");
+            $("#viewMatchesForm").css("display", "none");
             $("#maindiv").css("opacity", 1);
             toastr.success("Donation Recorded !");
           })
@@ -372,7 +382,7 @@ App = {
       .on('error', (err) => {
         console.log(err)
         $(".loader").css("display", "none");
-        $("#viewMatchesForm").css("opacity",1);
+        $("#viewMatchesForm").css("opacity", 1);
         toastr.error("Error ocurred in registration process !");
         toastr.error(err)
       })
@@ -401,8 +411,8 @@ App = {
           for (let i = 0; i < orgAddresses.length; i++) {
 
             // Append org to the table
-            // let _org = orgdata.find((e) => e.accountAddress == orgAddresses[i])
-            let _org = orgdata[i]
+            let _org = orgdata.find((e) => e.accountAddress == orgAddresses[i])
+            // let _org = orgdata
 
             // let _status = statuses[i] == 1 ? "ACCEPTED" : (statuses[i] == 2 ? "DECLINED" : "DONATED")
             if (_org) {
@@ -419,9 +429,20 @@ App = {
           }
 
           $(".loader").css("display", "none");
-          $("#viewDonationStatusForm").css('display','block');
-          $("#maindiv").css("opacity", 0.2);
-          toastr.success("Your donations recieved");
+
+          if (orgdata.length > 0) {
+            $("#viewDonationStatusForm").css('display', 'block');
+            $("#maindiv").css("opacity", 0.2);
+            console.log(orgdata);
+            toastr.success("Your donations recieved");
+
+          }
+          else {
+            $("#maindiv").css("opacity", 1);
+            console.log(orgdata);
+            toastr.success("No donations found !");
+
+          }
 
         })
       })
@@ -466,8 +487,23 @@ App = {
           }
 
           $(".loader").css("display", "none");
-          $("#viewDonationsForm").css("display", "block");
-          $("#maindiv").css("opacity", 0.2);
+
+          if (donationdata.length > 0) {
+            $("#viewDonationsForm").css("display", "block");
+            $("#maindiv").css("opacity", 0.2);
+            console.log(donationdata);
+            toastr.success("Donations recieved !");
+
+          }
+          else {
+            $("#maindiv").css("opacity", 1);
+            console.log(donationdata);
+            toastr.success("No donations found !");
+
+          }
+
+
+
 
         })
       })
@@ -502,7 +538,7 @@ App = {
           }).done((res) => {
             $(".loader").css("display", "none");
             $("#maindiv").css("opacity", 1);
-            $("#viewDonationsForm").css("display","none");
+            $("#viewDonationsForm").css("display", "none");
             if (decision == 1)
               toastr.success("Donation Accepted !");
             else
